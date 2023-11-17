@@ -30,11 +30,12 @@ export default function AppRoutes() {
         }}
       />
 
-      {/* <AppStack.Screen
+      <AppStack.Screen
         name="Chat"
         component={Chat}
         options={({ route, navigation }) => ({
-          title: route.params.thread.name,
+          // title: route.params.thread.name,
+          title: "NomeDoGrupo",
           headerRight: () => (
             <TouchableOpacity
               onPress={() => {
@@ -54,7 +55,7 @@ export default function AppRoutes() {
         options={{
           title: "Dados da conversa"
         }}
-      /> */}
+      />
 
       <AppStack.Screen
         name="Search"
