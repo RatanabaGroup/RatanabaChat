@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "43343432563",
+    "project_id": "chat-b1b37",
+    "storage_bucket": "chat-b1b37.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:43343432563:android:2999d7959a14bc15df5306",
+        "android_client_info": {
+          "package_name": "com.ratanaba"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyA8JBEvGkHOJAoLsZA0fHUs4kqimUBRjjo"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
