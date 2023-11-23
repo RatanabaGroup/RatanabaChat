@@ -1,8 +1,23 @@
+import React, { useMemo, useState } from 'react';
 import { View, Text, StyleSheet, TouchableOpacity, TextInput, Alert } from 'react-native';
+import auth from '@react-native-firebase/auth';
+import firestore from '@react-native-firebase/firestore';
 
-export default function ChatMessage() {
+export default function ChatMessage({ data, thread }) {
+  const user = auth().currentUser.toJSON();
+  const [isEditing, setIsEditing] = useState(false);
+  const [editedText, setEditedText] = useState(data.text);
 
-  function editMessage() {
+  const isMyMessage = useMemo(() => {
+    return data?.user?._id === user.uid
+  }, [data])
+
+  console.log(data);
+
+  function editMessage(id_user, id) {
+    if (id_user !== user?.uid) return;
+
+
     Alert.alert(
       "Editar ou deletar?",
       "Escolha uma opção:",
@@ -16,7 +31,7 @@ export default function ChatMessage() {
         {
           text: "Deletar",
           onPress: () => {
-            deleteMessage()
+            deleteMessage(id)
           }
         },
         {
@@ -27,31 +42,77 @@ export default function ChatMessage() {
     );
   }
 
-  async function updateMessage() {
+  async function updateMessage(documentId) {
+    console.log(documentId);
+    try {
+      await firestore()
+        .collection('grupos')
+        .doc(thread)
+        .collection('mensagens')
+        .doc(documentId)
+        .update({
+          text: editedText
+        });
+      setIsEditing(false);
+    } catch (error) {
+      console.error('Erro ao atualizar mensagem:', error);
+    }
   }
 
-  async function deleteMessage() {
+  async function deleteMessage(documentId) {
+    try {
+      await firestore()
+        .collection('grupos')
+        .doc(thread)
+        .collection('mensagens')
+        .doc(documentId)
+        .delete();
+    } catch (error) {
+      console.error('Erro ao atualizar mensagem:', error);
+    }
   }
+
+
+  const handleTextChange = (text) => {
+    setEditedText(text);
+  };
 
   return (
     <View style={styles.container}>
-      <TouchableOpacity onPress={() => editMessage()}>
+      <TouchableOpacity onPress={() => editMessage(data?.user?._id, data?._id)}>
         <View style={[styles.messageBox, {
+          backgroundColor: data.system === true ? 'transparent' : isMyMessage ? '#DCF8C5' : '#FFF',
+          marginLeft: isMyMessage ? 50 : 0,
+          marginRight: isMyMessage ? 0 : 50,
           borderBottomWidth: 1,
+          borderBottomColor: data.system === true ? '#000' : 'transparent'
         }
         ]}
         >
-          <Text style={styles.name}>displayName</Text>
+          {!isMyMessage &&
+            <Text style={styles.name}>{data?.user?.displayName}</Text>
+          }
           
-          <Text style={styles.message}>mensagem</Text>
+          {isEditing ? (
+            <TextInput
+              value={editedText}
+              onChangeText={handleTextChange}
+              onBlur={() => updateMessage(data._id)} 
+              autoFocus
+            />
 
-          <Text style={styles.hour}>hora</Text>
+          ) : (
+            <Text style={styles.message}>{editedText}</Text>
+          )}
+
+          <Text style={styles.hour}>
+            {new Date(data?.createdAt?.nanoseconds * 1000 + data?.createdAt?.seconds).toLocaleTimeString('pt-BR', {timeZone: 'America/Sao_Paulo', hour: '2-digit', minute: '2-digit'})}
+          </Text>
 
         </View>
       </TouchableOpacity>
     </View>
   );
-
 }
 
 const styles = StyleSheet.create({

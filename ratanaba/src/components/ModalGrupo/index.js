@@ -4,69 +4,86 @@ import {
   TouchableOpacity, TouchableWithoutFeedback
 } from 'react-native';
 
-// import firestore from '@react-native-firebase/firestore';
-// import auth from '@react-native-firebase/auth';
+import firestore from '@react-native-firebase/firestore';
+import auth from '@react-native-firebase/auth';
 
 export default function ModalGrupo({ setVisible, setUpdateScreen }) {
   const [room, setRoom] = useState('');
-//   const user = auth().currentUser.toJSON();
+  const user = auth().currentUser.toJSON();
 
   function handleButtonCreate() {
     if (room === '') return;
 
     //1 usuario pode criar só 4 grupos
-    // firestore().collection('MESSAGE_THREADS')
-    //   .get()
-    //   .then((snapshot) => {
-    //     let myThreads = 0;
+    firestore().collection('grupos')
+      .get()
+      .then((snapshot) => {
+        let myThreads = 0;
 
-    //     snapshot.docs.map(docItem => {
-    //       if (docItem.data().owner === user.uid) {
-    //         myThreads += 1;
-    //       }
-    //     })
+        snapshot.docs.map(docItem => {
+          if (docItem.data().owner === user.uid) {
+            myThreads += 1;
+          }
+        })
 
-    //     if (myThreads >= 4) {
-    //       Alert.alert(
-    //         "Atenção!",
-    //         "Você já atingiu o limite de grupo por usuário.",
-    //         [ { text: "OK", onPress: () => {}, style: "cancel" } ]
-    //       )
-    //     } else {
-    //       createRoom();
-    //     }
+        if (myThreads >= 4) {
+          Alert.alert(
+            "Atenção!",
+            "Você já atingiu o limite de grupo por usuário.",
+            [ { text: "OK", onPress: () => {}, style: "cancel" } ]
+          )
+        } else {
+          createRoom();
+        }
 
-    //   })
+      })
 
   }
 
   function createRoom() {
-    // firestore()
-    //   .collection('MESSAGE_THREADS')
-    //   .add({
-    //     name: room,
-    //     owner: user.uid,
-    //     lastMessage: {
-    //       text: `${user.displayName} criou o grupo "${room}"`,
-    //       createdAt: firestore.FieldValue.serverTimestamp(),
-    //     }
-    //   })
-    //   .then((docRef) => {
-    //     docRef.collection('MESSAGES').add({
-    //       text: `${user.displayName} criou o grupo "${room}"`,
-    //       createdAt: firestore.FieldValue.serverTimestamp(),
-    //       system: true,
-    //     })
-    //       .then(() => {
-    //         setVisible();
-    //         setUpdateScreen();
-    //       })
-
-    //   })
-    //   .catch((err) => {
-    //     console.log(err);
-    //   })
-
+    firestore()
+      .collection('grupos')
+      .add({
+        name: room,
+        owner: user.displayName,
+        lastMessage: {
+          text: `${user.displayName} criou o grupo "${room}"`,
+          createdAt: firestore.FieldValue.serverTimestamp(),
+        }
+      })
+      .then((docRef) => {
+        docRef.collection('mensagens').add({
+          text: `${user.displayName} criou o grupo "${room}"`,
+          createdAt: firestore.FieldValue.serverTimestamp(),
+          system: true,
+        });
+  
+        firestore().collection('usuarios')
+        .get()
+        .then((querySnapshot) => {
+          querySnapshot.forEach((userDoc) => {
+            let position = "Membro";
+            if (userDoc.data().name === user.displayName) {
+              position = "Admin";
+            }
+            docRef.collection('participantes').add({
+              userId: userDoc.id,
+              name: userDoc.data().name,
+              email: userDoc.data().email,
+              position: position
+            });
+          });
+  
+            setVisible();
+            setUpdateScreen();
+          })
+          .catch((err) => {
+            console.log('Erro ao obter usuários:', err);
+          });
+      })
+      .catch((err) => {
+        console.log('Erro ao criar sala de bate-papo:', err);
+      });
   }
 
   return (

@@ -3,18 +3,12 @@ import { View, Text, StyleSheet, TouchableOpacity } from 'react-native';
 
 import { useNavigation } from '@react-navigation/native';
 
-export default function AddButton({ setVisible }){
-  
-    function handleNavigateButton(){
-      setVisible()
-    }
-    
-// export default function AddButton({ setVisible, userStatus }){
-//   const navigation = useNavigation();
+export default function AddButton({ setVisible, userStatus }){
+  const navigation = useNavigation();
 
-//   function handleNavigateButton(){
-//     userStatus ? setVisible() : navigation.navigate("SignIn")
-//   }
+  function handleNavigateButton(){
+    userStatus ? setVisible() : navigation.navigate("SignIn")
+  }
 
   return(
     <TouchableOpacity 

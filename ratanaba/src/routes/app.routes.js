@@ -34,16 +34,16 @@ export default function AppRoutes() {
         name="Chat"
         component={Chat}
         options={({ route, navigation }) => ({
-          // title: route.params.thread.name,
-          title: "NomeDoGrupo",
+          title: route.params.thread.name,
           headerRight: () => (
             <TouchableOpacity
               onPress={() => {
-                navigation.navigate('ChatConfig');
+                navigation.navigate('ChatConfig', {
+                  idGrupo: route.params.thread._id,
+                });
               }}
-              
             >
-              <Feather name="settings" size={24} color="#000"/>
+              <Feather name="settings" size={24} color="#000" />
             </TouchableOpacity>
           ),
         })}
@@ -52,9 +52,9 @@ export default function AppRoutes() {
       <AppStack.Screen
         name="ChatConfig"
         component={ChatConfig}
-        options={{
+        options={({ route }) => ({
           title: "Dados da conversa"
-        }}
+        })}
       />
 
       <AppStack.Screen

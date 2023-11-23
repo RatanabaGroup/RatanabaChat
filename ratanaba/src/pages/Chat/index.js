@@ -2,76 +2,75 @@ import React, { useState, useEffect } from 'react';
 import { View, Text, StyleSheet, SafeAreaView, FlatList,
         KeyboardAvoidingView, Platform, TextInput, TouchableOpacity } from 'react-native';
 
-// import auth from '@react-native-firebase/auth';
-// import firestore from '@react-native-firebase/firestore';
+import auth from '@react-native-firebase/auth';
+import firestore from '@react-native-firebase/firestore';
 
 import ChatMessage from '../../components/ChatMessage';
 
 import Feather from 'react-native-vector-icons/Feather';
 
-export default function Chat(){
-// export default function Chat({ route }){
+export default function Chat({ route }){
 
-//   const { thread } = route.params;
+  const { thread } = route.params;
   const [messages, setMessages] = useState([]);
   const [input, setInput] = useState('');
   
-//   const user = auth().currentUser.toJSON();
+  const user = auth().currentUser.toJSON();
 
-//   useEffect(() => {
-//     const unsubscribeListener = firestore().collection('MESSAGE_THREADS')
-//     .doc(thread._id)
-//     .collection('MESSAGES')
-//     .orderBy('createdAt', 'desc')
-//     .onSnapshot( querySnapshot => {
-//         const messages = querySnapshot.docs.map(doc => {
-//           const firebaseData = doc.data()
-//           const data = {
-//             _id: doc.id,
-//             text: '',
-//             createdAt: firestore.FieldValue.serverTimestamp(),
-//             ...firebaseData
-//           }
-//           if(!firebaseData.system){
-//             data.user = {
-//               ...firebaseData.user,
-//               name: firebaseData.user.displayName
-//             }
-//           }
-//           return data;
-//         })
-//         setMessages(messages)
-//     })
-//     return () => unsubscribeListener()
-//   }, []);
+  useEffect(() => {
+    const unsubscribeListener = firestore().collection('grupos')
+    .doc(thread._id)
+    .collection('mensagens')
+    .orderBy('createdAt', 'desc')
+    .onSnapshot( querySnapshot => {
+        const messages = querySnapshot.docs.map(doc => {
+          const firebaseData = doc.data()
+          const data = {
+            _id: doc.id,
+            text: '',
+            createdAt: firestore.FieldValue.serverTimestamp(),
+            ...firebaseData
+          }
+          if(!firebaseData.system){
+            data.user = {
+              ...firebaseData.user,
+              name: firebaseData.user.displayName
+            }
+          }
+          return data;
+        })
+        setMessages(messages)
+    })
+    return () => unsubscribeListener()
+  }, []);
 
   async function handleSend(){
     if(input === '') return;
 
-    // await firestore()
-    // .collection('MESSAGE_THREADS')
-    // .doc(thread._id)
-    // .collection('MESSAGES')
-    // .add({
-    //   text: input,
-    //   createdAt: firestore.FieldValue.serverTimestamp(),
-    //   user: {
-    //     _id: user.uid,
-    //     displayName: user.displayName
-    //   }
-    // })
+    await firestore()
+    .collection('grupos')
+    .doc(thread._id)
+    .collection('mensagens')
+    .add({
+      text: input,
+      createdAt: firestore.FieldValue.serverTimestamp(),
+      user: {
+        _id: user.uid,
+        displayName: user.displayName
+      }
+    })
 
-    // await firestore()
-    // .collection('MESSAGE_THREADS')
-    // .doc(thread._id)
-    // .set( {
-    //     lastMessage: {
-    //       text: input,
-    //       createdAt: firestore.FieldValue.serverTimestamp(),
-    //     }
-    //   }, { merge: true }
-    // )
-    // setInput('');
+    await firestore()
+    .collection('grupos')
+    .doc(thread._id)
+    .set( {
+        lastMessage: {
+          text: input,
+          createdAt: firestore.FieldValue.serverTimestamp(),
+        }
+      }, { merge: true }
+    )
+    setInput('');
   }
 
   return (

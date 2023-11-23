@@ -2,8 +2,8 @@ import React, { useState, useEffect } from 'react';
 import { View, Text, StyleSheet, SafeAreaView, TouchableOpacity,
         Image, Modal, ActivityIndicator, FlatList, Alert } from 'react-native';
 
-// import auth from '@react-native-firebase/auth';
-// import firestore from '@react-native-firebase/firestore';
+import auth from '@react-native-firebase/auth';
+import firestore from '@react-native-firebase/firestore';
 
 import { useNavigation, useIsFocused } from '@react-navigation/native';
 import MaterialIcons from 'react-native-vector-icons/MaterialIcons';
@@ -25,45 +25,45 @@ export default function Dashboard(){
   const [loading, setLoading] = useState(true);
   const [updateScreen, setUpdateScreen] = useState(false);
 
-//   useEffect(()=>{
-//     const hasUser = auth().currentUser ? auth().currentUser.toJSON() : null;
-//     setUser(hasUser);
+  useEffect(()=>{
+    const hasUser = auth().currentUser ? auth().currentUser.toJSON() : null;
+    setUser(hasUser);
 
-//   }, [isFocused]);
+  }, [isFocused]);
 
 
-//   useEffect(()=>{
-//     let isActive = true;
+  useEffect(()=>{
+    let isActive = true;
 
-//     function getChats(){
-//       firestore()
-//       .collection('MESSAGE_THREADS')
-//       .orderBy('lastMessage.createdAt', 'desc')
-//       .limit(10)
-//       .get()
-//       .then((snapshot)=>{
-//         const threads = snapshot.docs.map( documentSnapshot => {
-//           return {
-//             _id:  documentSnapshot.id,
-//             name: '',
-//             lastMessage: { text: '' },
-//             ...documentSnapshot.data()
-//           }
-//         })
-//         if(isActive){
-//           setThreads(threads);
-//           setLoading(false);
-//         }
-//       })
-//     }
+    function getChats(){
+      firestore()
+      .collection('grupos')
+      .orderBy('lastMessage.createdAt', 'desc')
+      .limit(10)
+      .get()
+      .then((snapshot)=>{
+        const threads = snapshot.docs.map( documentSnapshot => {
+          return {
+            _id:  documentSnapshot.id,
+            name: '',
+            lastMessage: { text: '' },
+            ...documentSnapshot.data()
+          }
+        })
+        if(isActive){
+          setThreads(threads);
+          setLoading(false);
+        }
+      })
+    }
 
-//     getChats();
+    getChats();
 
-//     return () => {
-//        isActive = false;
-//     }
+    return () => {
+       isActive = false;
+    }
 
-//   }, [isFocused, updateScreen]);
+  }, [isFocused, updateScreen]);
 
   function deleteRoom(ownerId, idRoom){
     console.log(typeof idRoom)
@@ -89,26 +89,24 @@ export default function Dashboard(){
   }
 
   async function handleDeleteRoom(idRoom){
-    // await firestore()
-    // .collection('MESSAGE_THREADS')
-    // .doc(idRoom)
-    // .delete();
+    await firestore()
+    .collection('grupos')
+    .doc(idRoom)
+    .delete();
 
-    // setUpdateScreen(!updateScreen);
+    setUpdateScreen(!updateScreen);
   }
 
   function handleSignOut(){
-    navigation.navigate("SignIn")
-
-    // auth()
-    // .signOut()
-    // .then(()=>{
-    //   setUser(null);
-    //   navigation.navigate("SignIn")
-    // })
-    // .catch(()=>{
-    //   console.log("Nao ha usuario logado")
-    // })
+    auth()
+    .signOut()
+    .then(()=>{
+      setUser(null);
+      navigation.navigate("SignIn")
+    })
+    .catch(()=>{
+      console.log("Nao ha usuario logado")
+    })
   }
 
   // if(loading){

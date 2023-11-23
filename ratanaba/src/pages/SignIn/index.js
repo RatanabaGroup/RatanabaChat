@@ -2,8 +2,11 @@ import React, { useState } from 'react';
 import { View, Text, StyleSheet, TouchableOpacity, TextInput, SafeAreaView,
         Platform, Image, Keyboard } from 'react-native';
 
-// import auth from '@react-native-firebase/auth';
+        
+import firestore from '@react-native-firebase/firestore';
+import auth from '@react-native-firebase/auth';
 import { useNavigation }  from '@react-navigation/native'
+import { set } from 'date-fns';
 
 export default function SignIn() {
   const navigation = useNavigation();
@@ -30,53 +33,74 @@ export default function SignIn() {
     if (type) {
       // Cadastrar
       if (name === '' || email === '' || password === '') return;
-    //   auth()
-    //   .createUserWithEmailAndPassword(email, password)
-    //   .then((user) => {
-    //     user.user.updateProfile({
-    //       displayName: name
-    //     })
-    //     .then(()=>{
-    //       navigation.goBack();
-    //     })
 
-    //   })
-    //   .catch((error) => {
-    //     console.log(error)
-    //     if (error.code === 'auth/invalid-email') {
-    //       setErrorMessage('Email inválido!');
-    //     }
-    
-    //     else if  (error.code === 'auth/email-already-in-use') {
-    //       setErrorMessage('Email já em uso!');
-    //     }
+      auth()
+      .createUserWithEmailAndPassword(email, password)
+      .then((user) => {
+        user.user.updateProfile({
+          displayName: name
+        })
+        .then(() => {
+          navigation.goBack();
+        });
 
-    //     else if (error.code === 'auth/weak-password') {
-    //       setErrorMessage('Senha fraca!');
-    //     }
-    //     else {
-    //       setErrorMessage("")
-    //     }
-    //   })
+        firestore().collection('usuarios')
+          .add({
+            name: name,
+            email: email
+          })
+          .then((userDoc) => {
+            firestore().collection('grupos')
+              .get()
+              .then((querySnapshot) => {
+                querySnapshot.forEach((grupoDoc) => {
+                  grupoDoc.ref.collection('participantes').add({
+                    userId: userDoc.id,
+                    name: name,
+                    email: email,
+                    position: "Membro"
+                  });
+                });
+              })
+              .catch((err) => {
+                console.log('Erro ao obter grupos:', err);
+              });
+          })
+          .catch((err) => {
+            console.log(err);
+          });
+      })
+      .catch((err) => {
+        console.log(err);
+        if (err.code === 'auth/invalid-email') {
+          setErrorMessage('Email inválido!');
+        } else if (err.code === 'auth/email-already-in-use') {
+          setErrorMessage('Email já em uso!');
+        } else if (err.code === 'auth/weak-password') {
+          setErrorMessage('Senha fraca!');
+        } else {
+          setErrorMessage("");
+        }
+      });
+    } else {
 
-    // } else {
+      // Login
+      auth()
+      .signInWithEmailAndPassword(email, password)
+      .then(()=>{
+        navigation.goBack();
+      })
+      .catch((error)=>{
+        console.log(error)
+        if (error.code === 'auth/invalid-login') {
+          setErrorMessage('Email ou senha incorretos!');
+        }else if (error.code === 'auth/invalid-email'){
+          setErrorMessage('Email inválido!');
+        } else {
+          setErrorMessage("")
+        }
+      })
 
-    //   // Login
-    //   auth()
-    //   .signInWithEmailAndPassword(email, password)
-    //   .then(()=>{
-    //     navigation.goBack();
-    //   })
-    //   .catch((error)=>{
-    //     console.log(error)
-    //     if (error.code === 'auth/invalid-login') {
-    //       setErrorMessage('Email ou senha incorretos!');
-    //     }else if (error.code === 'auth/invalid-email'){
-    //       setErrorMessage('Email inválido!');
-    //     } else {
-    //       setErrorMessage("")
-    //     }
-    //   })
     }
   }
 

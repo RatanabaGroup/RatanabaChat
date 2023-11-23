@@ -11,6 +11,7 @@ export default function ChatList({ data, deleteRoom, userStatus }){
     }else{
       navigation.navigate("SignIn")
     }
+
   }
 
   return(
@@ -20,13 +21,11 @@ export default function ChatList({ data, deleteRoom, userStatus }){
         <View style={styles.content}>
 
           <View style={styles.header}>
-          {/* <Text style={styles.nameText} numberOfLines={1}>{data.name}</Text> */}
-          <Text style={styles.nameText} numberOfLines={1}>nome do grupo</Text>
+            <Text style={styles.nameText} numberOfLines={1}>{data.name}</Text>
           </View>
 
           <Text style={styles.contentText} numberOfLines={1}>
-            {/* {data.lastMessage.text} */}
-            ultima mensagem
+            {data.lastMessage.text}
           </Text>
         </View>
 

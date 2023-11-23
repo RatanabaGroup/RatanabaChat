@@ -1,38 +1,60 @@
-import React from 'react';
-import { View, Text, StyleSheet, TouchableOpacity, FlatList, Button } from 'react-native';
+import React, { useEffect, useState } from 'react';
+import { View, Text, StyleSheet, TouchableOpacity, FlatList } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
-// import auth from '@react-native-firebase/auth';
-// import firestore from '@react-native-firebase/firestore';
 
-export default function ChatConfig() {
-// export default function ChatConfig({ route }) {
-  // const user = auth().displayName.toJSON();
-//   const { data, thread } = route.params || {};
+import firestore from '@react-native-firebase/firestore';
+
+export default function ChatConfig({ route }) {
+  const [participants, setParticipants] = useState([]);
+  const { idGrupo } = route.params;
+
+  useEffect(() => {
+    const fetchData = async () => {
+      const participantsCollection = await firestore()
+        .collection('grupos')
+        .doc(idGrupo)
+        .collection('participantes')
+        .get();
+
+      const participantsData = participantsCollection.docs.map(doc => doc.data());
+      setParticipants(participantsData);
+    };
+
+    fetchData();
+  }, [idGrupo]);
 
   return (
     <SafeAreaView>
       <View style={styles.header}>
         <Text style={styles.nameText}>Participantes</Text>
       </View>
-      
-      <TouchableOpacity >
-        <View style={styles.row}>
-        
-          <View style={styles.content}>
-            <Text style={styles.contentText}>nome</Text>
-          </View>
 
-          <View style={styles.content}>
-            <Text style={styles.contentText}>cargo</Text>
-          </View>
+      <FlatList
+        data={participants}
+        keyExtractor={(item) => item.userId}
+        renderItem={({ item }) => (
+          <>
+            <View style={styles.row}>
 
-        </View>
+              <View style={styles.content}>
+                <Text style={styles.contentName}>{item.name}</Text>
+              </View>
 
-        <View style={styles.bottomBorder} />
+              <View style={styles.content}>
+                <Text style={styles.contentPosition}>{item.position}</Text>
+              </View>
+              {/* <Text style={styles.contentPosition}>
+                {item.position === 'Membro' ? null : item.position}
+              </Text> */}
+            </View>
 
-      </TouchableOpacity>
+            <View style={styles.bottomBorder} />
+          </>
+        )}
+      />
+
     </SafeAreaView>
-  )
+  );
 }
 
 const styles = StyleSheet.create({
@@ -54,19 +76,25 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'space-between',
-    marginVertical: 4,
+    marginVertical: 6,
+    marginHorizontal: 30,
   },
   content: {
     flexDirection: 'row',
   },
-  contentText: {
-    color: '#8B8B8B',
+  contentName: {
+    color: '#000',
     fontSize: 16,
+    marginTop: 2,
+  },
+  contentPosition: {
+    color: '#8B8B8B',
+    fontSize: 14,
     marginTop: 2,
   },
   bottomBorder: {
     height: 1,
     backgroundColor: '#FFF',
-    marginHorizontal: 10,
+    marginHorizontal: 20,
   }
 })
