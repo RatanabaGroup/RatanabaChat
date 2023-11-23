@@ -1,12 +1,17 @@
 import React, { useEffect, useState } from 'react';
-import { View, Text, StyleSheet, TouchableOpacity, FlatList } from 'react-native';
+import { View, Text, StyleSheet, TouchableOpacity, FlatList, Alert } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
+import Popover from 'react-native-popover-view';
+import Feather from 'react-native-vector-icons/Feather';
 
+import auth from '@react-native-firebase/auth';
 import firestore from '@react-native-firebase/firestore';
 
 export default function ChatConfig({ route }) {
   const [participants, setParticipants] = useState([]);
   const { idGrupo } = route.params;
+
+  const user = auth().currentUser.toJSON();
 
   useEffect(() => {
     const fetchData = async () => {
@@ -23,6 +28,28 @@ export default function ChatConfig({ route }) {
     fetchData();
   }, [idGrupo]);
 
+  const [isVisible, setIsVisible] = useState(false);
+  const showPopover = () => { setIsVisible(true) }
+  const closePopover = () => { setIsVisible(false) }
+
+  function exitRoom() {
+    Alert.alert(
+      "Atenção!",
+      "Você tem certeza que deseja sair do grupo?",
+      [
+        {
+          text: "Cancelar",
+          onPress: () => { },
+          style: "cancel"
+        },
+        {
+          text: "Confirmar",
+          onPress: () => handleExitRoom()
+        }
+      ]
+    )
+  }
+
   return (
     <SafeAreaView>
       <View style={styles.header}>
@@ -34,7 +61,7 @@ export default function ChatConfig({ route }) {
         keyExtractor={(item) => item.userId}
         renderItem={({ item }) => (
           <>
-            <View style={styles.row}>
+            <TouchableOpacity onPress={showPopover} style={styles.row}>
 
               <View style={styles.content}>
                 <Text style={styles.contentName}>{item.name}</Text>
@@ -43,15 +70,46 @@ export default function ChatConfig({ route }) {
               <View style={styles.content}>
                 <Text style={styles.contentPosition}>{item.position}</Text>
               </View>
-              {/* <Text style={styles.contentPosition}>
-                {item.position === 'Membro' ? null : item.position}
-              </Text> */}
-            </View>
+            </TouchableOpacity>
+
+            <Popover
+              onClose={closePopover}
+              isVisible={isVisible}
+              popoverStyle={{
+                height: 150,
+                width: 300,
+                justifyContent: "center",
+                alignItems: "center"
+              }}
+            >
+              <Text style={[styles.option, {
+                color: 'red'
+              }]}
+              >
+                {/* {user.uid === 'Admin' &&
+                  'Remover do grupo'
+                } */}
+                Remover do grupo
+              </Text>
+
+              <TouchableOpacity onPress={closePopover}>
+                <Text style={[styles.option, {
+                  color: '#2E54D4'
+                }]}
+                >Fechar</Text>
+              </TouchableOpacity>
+            </Popover>
 
             <View style={styles.bottomBorder} />
           </>
         )}
       />
+
+      {/* {user.uid === item.userId && item.position === 'Membro' ? (
+        <View style={styles.leave} onPress={exitRoom}>
+          <Feather name="log-out" size={28} color="#000" />
+        </View>
+      ) : null} */}
 
     </SafeAreaView>
   );
@@ -96,5 +154,12 @@ const styles = StyleSheet.create({
     height: 1,
     backgroundColor: '#FFF',
     marginHorizontal: 20,
-  }
+  },
+  option: {
+    padding: 5,
+  },
+  leave: {
+    marginTop: 100,
+    alignItems: 'center',
+  },
 })
