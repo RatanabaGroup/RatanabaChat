@@ -1,4 +1,4 @@
-import React, { useMemo, useState } from 'react';
+import React, { useMemo, useState, useEffect } from 'react';
 import { View, Text, StyleSheet, TouchableOpacity, TextInput, Alert } from 'react-native';
 import auth from '@react-native-firebase/auth';
 import firestore from '@react-native-firebase/firestore';
@@ -7,16 +7,58 @@ export default function ChatMessage({ data, thread }) {
   const user = auth().currentUser.toJSON();
   const [isEditing, setIsEditing] = useState(false);
   const [editedText, setEditedText] = useState(data.text);
+  const [relation, setRelation] = useState([]);
 
   const isMyMessage = useMemo(() => {
     return data?.user?._id === user.uid
   }, [data])
+  
+  useEffect(() => {
+    const fetchData = async () => {
+      const participantsCollection = await firestore()
+        .collection('grupos').doc(thread)
+        .collection('participantes').get();
 
-  console.log(data);
+      participantsCollection.docs.map(doc => {
+        if (doc.data().email === user.email) {
+          const participantData = {
+            ...doc.data(),
+            id: doc.id
+          };
+          setRelation(participantData);
+        }
+      });
+    };
+
+    console.log(relation);
+
+    fetchData();
+  }, []);
+
+  // async function deleteMessage() {
+  //   try {
+  //     const unsubscribe = firestore()
+  //       .collection('grupos')
+  //       .onSnapshot((querySnapshot) => {
+  //         const mensagens = [];
+  //         querySnapshot.forEach((doc) => {
+  //           mensagens.push({
+  //             id: doc.id,
+  //             ...doc.data(),
+  //           });
+  //         });
+  //         console.log("oii");
+  //         callback(mensagens);
+  //       });
+  //       // Se necessário, você pode retornar a função de cancelamento para desinscrever-se mais tarde
+  //     return () => unsubscribe();
+  //   } catch (error) {
+  //     console.error('Erro ao atualizar mensagem:', error);
+  //   }
+  // }
 
   function editMessage(id_user, id) {
-    if (id_user !== user?.uid) return;
-
+    if (id_user !== user?.uid && relation.position !== "Admin") return;
 
     Alert.alert(
       "Editar ou deletar?",
@@ -43,13 +85,9 @@ export default function ChatMessage({ data, thread }) {
   }
 
   async function updateMessage(documentId) {
-    console.log(documentId);
     try {
-      await firestore()
-        .collection('grupos')
-        .doc(thread)
-        .collection('mensagens')
-        .doc(documentId)
+      await firestore().collection('grupos').doc(thread)
+        .collection('mensagens').doc(documentId)
         .update({
           text: editedText
         });
@@ -61,11 +99,8 @@ export default function ChatMessage({ data, thread }) {
 
   async function deleteMessage(documentId) {
     try {
-      await firestore()
-        .collection('grupos')
-        .doc(thread)
-        .collection('mensagens')
-        .doc(documentId)
+      await firestore().collection('grupos').doc(thread)
+        .collection('mensagens').doc(documentId)
         .delete();
     } catch (error) {
       console.error('Erro ao atualizar mensagem:', error);

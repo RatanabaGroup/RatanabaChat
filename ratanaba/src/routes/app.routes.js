@@ -9,6 +9,7 @@ import Chat from '../pages/Chat';
 import Search from '../pages/Search';
 import ChatConfig from '../components/ChatConfig';
 
+
 const AppStack = createNativeStackNavigator();
 
 export default function AppRoutes() {
@@ -52,9 +53,9 @@ export default function AppRoutes() {
       <AppStack.Screen
         name="ChatConfig"
         component={ChatConfig}
-        options={({ route }) => ({
+        options={{
           title: "Dados da conversa"
-        })}
+        }}
       />
 
       <AppStack.Screen

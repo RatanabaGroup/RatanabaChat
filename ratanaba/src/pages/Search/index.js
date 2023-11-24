@@ -23,53 +23,62 @@ export default function Search(){
     setUser(hasUser);
   }, [isFocused]);
 
-  async function handleSearch(){
-    if(input === '') return;
-
+  async function handleSearch() {
+    if (input === '') return;
+  
+    const lowercaseInput = input.toLowerCase(); // Convertendo para minúsculas
+  
     const responseSearch = await firestore()
-    .collection('grupos')
-    .where('name', '>=', input)
-    .where('name', '<=', input + '\uf8ff')
-    .get()
-    .then( (querySnapshot) => {
-
-      const threads = querySnapshot.docs.map( documentSnapshot => {
-        return{
-          _id: documentSnapshot.id,
-          name: '',
-          lastMessage: { text: '' },
-          ...documentSnapshot.data()
-        }
+      .collection('grupos')
+      .where('name', '>=', lowercaseInput)
+      .where('name', '<=', lowercaseInput + '\uf8ff')
+      .get()
+      .then((querySnapshot) => {
+        const threads = querySnapshot.docs.map((documentSnapshot) => {
+          return {
+            _id: documentSnapshot.id,
+            name: '',
+            lastMessage: { text: '' },
+            ...documentSnapshot.data(),
+          };
+        });
+  
+        setChats(threads);
+        setInput('');
+        Keyboard.dismiss();
       })
-
-      setChats(threads);
-      //console.log(threads)
-      setInput('');
-      Keyboard.dismiss();
-    })
+      .catch((error) => {
+        console.error('Error searching for documents: ', error);
+      });
   }
+  
 
-  return (
+return (
     <SafeAreaView style={styles.container}>
       <View style={styles.containerInput}>
         <TextInput
           placeholder='Nome da unidade'
           value={input}
-          onChangeText={ (text) => setInput(text) }
+          onChangeText={(text) => {
+            setInput(text);
+            handleSearch(text); // Chamada da função durante a digitação
+          }}
           style={styles.input}
-          // autoCapitalize={'none'}
         />
 
-        <TouchableOpacity style={styles.buttonSearch} onPress={handleSearch} >
+        <TouchableOpacity style={styles.buttonSearch} onPress={() => {
+          handleSearch(input);
+          Keyboard.dismiss();
+        }}>
           <MaterialIcons name="search" size={30} color="#FFF" />
         </TouchableOpacity>
       </View>
 
-      <FlatList 
+      <FlatList
         showsVerticalScrollIndicator={false}
         data={chats}
-        keyExtractor={ item => item._id}
-        renderItem={ ({ item}) => <ChatList data={item} userStatus={user} />}
+        keyExtractor={(item) => item._id}
+        renderItem={({ item }) => <ChatList data={item} userStatus={user} />}
       />
     </SafeAreaView>
   );

@@ -3,15 +3,18 @@ import { View, Text, StyleSheet, TouchableOpacity, FlatList, Alert } from 'react
 import { SafeAreaView } from 'react-native-safe-area-context';
 import Popover from 'react-native-popover-view';
 import Feather from 'react-native-vector-icons/Feather';
+import { useNavigation } from '@react-navigation/native';
 
 import auth from '@react-native-firebase/auth';
 import firestore from '@react-native-firebase/firestore';
 
 export default function ChatConfig({ route }) {
   const [participants, setParticipants] = useState([]);
+  const [relation, setRelation] = useState([]);
   const { idGrupo } = route.params;
 
   const user = auth().currentUser.toJSON();
+  const navigation = useNavigation();
 
   useEffect(() => {
     const fetchData = async () => {
@@ -21,7 +24,24 @@ export default function ChatConfig({ route }) {
         .collection('participantes')
         .get();
 
-      const participantsData = participantsCollection.docs.map(doc => doc.data());
+      // const participantsData = participantsCollection.docs.map(doc => doc.data());
+      const participantsData = participantsCollection.docs.map(doc => ({
+        ...doc.data(),
+        id: doc.id
+      }))
+
+      console.log(participantsData);
+
+      participantsCollection.docs.map(doc => {
+        if (doc.data().email === user.email) {
+          const participantData = {
+            ...doc.data(),
+            id: doc.id
+          };
+          setRelation(participantData);
+        }
+      });
+
       setParticipants(participantsData);
     };
 
@@ -34,7 +54,7 @@ export default function ChatConfig({ route }) {
 
   function exitRoom() {
     Alert.alert(
-      "Atenção!",
+      "Atenção",
       "Você tem certeza que deseja sair do grupo?",
       [
         {
@@ -50,6 +70,34 @@ export default function ChatConfig({ route }) {
     )
   }
 
+  async function handleExitRoom() {
+    try {
+      await firestore()
+        .collection('grupos')
+        .doc(route.params.idGrupo)
+        .collection('participantes')
+        .doc(relation.id)
+        .delete();
+    } catch (error) {
+      console.error('Erro ao atualizar mensagem:', error);
+    }
+    navigation.navigate('Dashboard')
+  }
+
+  async function remove(id) {
+    try {
+      await firestore()
+        .collection('grupos')
+        .doc(route.params.idGrupo)
+        .collection('participantes')
+        .doc(id)
+        .delete();
+    } catch (error) {
+      console.error('Erro ao atualizar mensagem:', error);
+    }
+    navigation.navigate('Dashboard')
+  }
+
   return (
     <SafeAreaView>
       <View style={styles.header}>
@@ -58,58 +106,53 @@ export default function ChatConfig({ route }) {
 
       <FlatList
         data={participants}
-        keyExtractor={(item) => item.userId}
+        keyExtractor={(item) => item.id}
         renderItem={({ item }) => (
           <>
             <TouchableOpacity onPress={showPopover} style={styles.row}>
-
               <View style={styles.content}>
                 <Text style={styles.contentName}>{item.name}</Text>
               </View>
-
               <View style={styles.content}>
                 <Text style={styles.contentPosition}>{item.position}</Text>
               </View>
             </TouchableOpacity>
 
-            <Popover
-              onClose={closePopover}
-              isVisible={isVisible}
-              popoverStyle={{
-                height: 150,
-                width: 300,
-                justifyContent: "center",
-                alignItems: "center"
-              }}
-            >
-              <Text style={[styles.option, {
-                color: 'red'
-              }]}
+            {relation.position === 'Admin' && (
+              <Popover
+                onClose={closePopover}
+                isVisible={isVisible}
+                popoverStyle={{
+                  height: 150,
+                  width: 300,
+                  justifyContent: "center",
+                  alignItems: "center"
+                }}
               >
-                {/* {user.uid === 'Admin' &&
-                  'Remover do grupo'
-                } */}
-                Remover do grupo
-              </Text>
-
-              <TouchableOpacity onPress={closePopover}>
-                <Text style={[styles.option, {
-                  color: '#2E54D4'
-                }]}
-                >Fechar</Text>
-              </TouchableOpacity>
-            </Popover>
+                <TouchableOpacity onPress={() => remove(item.id)}>
+                  <Text style={[styles.option, { color: 'red' }]}>
+                    Remover do grupo
+                  </Text>
+                </TouchableOpacity>
+                <TouchableOpacity onPress={closePopover}>
+                  <Text style={[styles.option, { color: '#2E54D4' }]}>
+                    Fechar
+                  </Text>
+                </TouchableOpacity>
+              </Popover>
+            )}
 
             <View style={styles.bottomBorder} />
           </>
         )}
       />
 
-      {/* {user.uid === item.userId && item.position === 'Membro' ? (
-        <View style={styles.leave} onPress={exitRoom}>
+
+      {relation.position === 'Membro' ? (
+        <TouchableOpacity style={styles.leave} onPress={exitRoom}>
           <Feather name="log-out" size={28} color="#000" />
-        </View>
-      ) : null} */}
+        </TouchableOpacity>
+      ) : null}
 
     </SafeAreaView>
   );
@@ -159,7 +202,7 @@ const styles = StyleSheet.create({
     padding: 5,
   },
   leave: {
-    marginTop: 100,
+    marginTop: 10,
     alignItems: 'center',
   },
 })
