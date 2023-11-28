@@ -60,6 +60,7 @@
 		<string>Ionicons.ttf</string>
 		<string>MaterialIcons.ttf</string>
 	</array>
-
+	<key>NSPhotoLibraryUsageDescription</key>
+	<string>This makes it possible to send files</string>
 </dict>
 </plist>

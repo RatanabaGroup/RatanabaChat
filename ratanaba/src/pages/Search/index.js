@@ -26,7 +26,7 @@ export default function Search(){
   async function handleSearch() {
     if (input === '') return;
   
-    const lowercaseInput = input.toLowerCase(); // Convertendo para minúsculas
+    const lowercaseInput = input.toLowerCase(); 
   
     const responseSearch = await firestore()
       .collection('grupos')
@@ -47,8 +47,8 @@ export default function Search(){
         setInput('');
         Keyboard.dismiss();
       })
-      .catch((error) => {
-        console.error('Error searching for documents: ', error);
+      .catch((err) => {
+        console.error('Erro em pesquisa: ', err);
       });
   }
   
@@ -61,7 +61,7 @@ return (
           value={input}
           onChangeText={(text) => {
             setInput(text);
-            handleSearch(text); // Chamada da função durante a digitação
+            handleSearch(text);
           }}
           style={styles.input}
         />

@@ -1,5 +1,5 @@
 import React, { useMemo, useState, useEffect } from 'react';
-import { View, Text, StyleSheet, TouchableOpacity, TextInput, Alert } from 'react-native';
+import { View, Text, StyleSheet, TouchableOpacity, TextInput, Alert, Image } from 'react-native';
 import auth from '@react-native-firebase/auth';
 import firestore from '@react-native-firebase/firestore';
 
@@ -12,7 +12,7 @@ export default function ChatMessage({ data, thread }) {
   const isMyMessage = useMemo(() => {
     return data?.user?._id === user.uid
   }, [data])
-  
+
   useEffect(() => {
     const fetchData = async () => {
       const participantsCollection = await firestore()
@@ -29,33 +29,9 @@ export default function ChatMessage({ data, thread }) {
         }
       });
     };
-
-    console.log(relation);
-
+    // console.log(relation);
     fetchData();
   }, []);
-
-  // async function deleteMessage() {
-  //   try {
-  //     const unsubscribe = firestore()
-  //       .collection('grupos')
-  //       .onSnapshot((querySnapshot) => {
-  //         const mensagens = [];
-  //         querySnapshot.forEach((doc) => {
-  //           mensagens.push({
-  //             id: doc.id,
-  //             ...doc.data(),
-  //           });
-  //         });
-  //         console.log("oii");
-  //         callback(mensagens);
-  //       });
-  //       // Se necessário, você pode retornar a função de cancelamento para desinscrever-se mais tarde
-  //     return () => unsubscribe();
-  //   } catch (error) {
-  //     console.error('Erro ao atualizar mensagem:', error);
-  //   }
-  // }
 
   function editMessage(id_user, id) {
     if (id_user !== user?.uid && relation.position !== "Admin") return;
@@ -69,14 +45,12 @@ export default function ChatMessage({ data, thread }) {
           onPress: () => {
             setIsEditing(true);
           }
-        },
-        {
+        }, {
           text: "Deletar",
           onPress: () => {
             deleteMessage(id)
           }
-        },
-        {
+        }, {
           text: "Cancelar",
           style: "cancel"
         }
@@ -107,7 +81,6 @@ export default function ChatMessage({ data, thread }) {
     }
   }
 
-
   const handleTextChange = (text) => {
     setEditedText(text);
   };
@@ -120,28 +93,36 @@ export default function ChatMessage({ data, thread }) {
           marginLeft: isMyMessage ? 50 : 0,
           marginRight: isMyMessage ? 0 : 50,
           borderBottomWidth: 1,
-          borderBottomColor: data.system === true ? '#000' : 'transparent'
+          borderBottomColor: data.system === true ? '#000' : 'transparent',
+          width: 'auto'
         }
         ]}
         >
           {!isMyMessage &&
             <Text style={styles.name}>{data?.user?.displayName}</Text>
           }
-          
+
           {isEditing ? (
             <TextInput
               value={editedText}
               onChangeText={handleTextChange}
-              onBlur={() => updateMessage(data._id)} 
+              onBlur={() => updateMessage(data._id)}
               autoFocus
             />
-
           ) : (
-            <Text style={styles.message}>{editedText}</Text>
+            data.message === "image" ? (
+              <Image
+              style={{ width: 200, height: 200 }}
+                source={{ uri: data.text }}
+              />
+            ) : (
+              <Text style={styles.message}>{editedText}</Text>
+            )
           )}
 
+
           <Text style={styles.hour}>
-            {new Date(data?.createdAt?.nanoseconds * 1000 + data?.createdAt?.seconds).toLocaleTimeString('pt-BR', {timeZone: 'America/Sao_Paulo', hour: '2-digit', minute: '2-digit'})}
+            {new Date(data?.createdAt?.nanoseconds * 1000 + data?.createdAt?.seconds).toLocaleTimeString('pt-BR', { timeZone: 'America/Sao_Paulo', hour: '2-digit', minute: '2-digit' })}
           </Text>
 
         </View>
@@ -163,7 +144,7 @@ const styles = StyleSheet.create({
     fontWeight: 'bold',
     marginBottom: 5,
   },
-  hour:{
+  hour: {
     marginLeft: 280,
     fontSize: 10
   }

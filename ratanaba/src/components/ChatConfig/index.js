@@ -30,7 +30,7 @@ export default function ChatConfig({ route }) {
         id: doc.id
       }))
 
-      console.log(participantsData);
+      // console.log(participantsData);
 
       participantsCollection.docs.map(doc => {
         if (doc.data().email === user.email) {

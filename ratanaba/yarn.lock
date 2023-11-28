@@ -2020,25 +2020,30 @@
     "prompts" "^2.4.0"
     "semver" "^7.5.2"
 
-"@react-native-firebase/app@^18.6.1", "@react-native-firebase/app@18.6.1":
-  "integrity" "sha512-lqINQLLTCmBSeln/cSPfvuJNQuwsPY9n6QyxSRRCTjyZdEPI3EY2df7isOCp8BwuxqYmkR9YhTNw2yFI72th+w=="
-  "resolved" "https://registry.npmjs.org/@react-native-firebase/app/-/app-18.6.1.tgz"
-  "version" "18.6.1"
+"@react-native-firebase/app@^18.6.2", "@react-native-firebase/app@18.6.2":
+  "integrity" "sha512-0hZ/4itfn5kxoUZsZfrpyTh4FDh4jFU/5svYaSAldPK3+xRmi1BSSx9PVzWt7vyw1Bi5ep/oLq/6sFaoqk5FFw=="
+  "resolved" "https://registry.npmjs.org/@react-native-firebase/app/-/app-18.6.2.tgz"
+  "version" "18.6.2"
   dependencies:
     "opencollective-postinstall" "^2.0.3"
     "superstruct" "^0.6.2"
 
-"@react-native-firebase/auth@^18.6.1":
-  "integrity" "sha512-UkULLVtUTUvTKfCVmSAxhPPTyXAgchE9J8KGaSjMpMZnDdW0R4Cr+w4lElOFPfpFq1+i8bKjTl/8nK16QHv3dA=="
-  "resolved" "https://registry.npmjs.org/@react-native-firebase/auth/-/auth-18.6.1.tgz"
-  "version" "18.6.1"
+"@react-native-firebase/auth@^18.6.2":
+  "integrity" "sha512-9YWMVWorCypcnpzEEDphk6yB1twC7JHeg4rsC8N3Los5EJf23Fz2eHtFf5aRJwAtgE89RUE5OGwqaEjbBHcvSw=="
+  "resolved" "https://registry.npmjs.org/@react-native-firebase/auth/-/auth-18.6.2.tgz"
+  "version" "18.6.2"
   dependencies:
     "plist" "^3.1.0"
 
-"@react-native-firebase/firestore@^18.6.1":
-  "integrity" "sha512-D3jGxNUMJg2D4CF7bdsXGfBAvs1F1XPOJMSqWJNFZnS/3voxiNclqrm4yxIn9ptFAsJHmXqMUHDA0vASxhZDWA=="
-  "resolved" "https://registry.npmjs.org/@react-native-firebase/firestore/-/firestore-18.6.1.tgz"
-  "version" "18.6.1"
+"@react-native-firebase/firestore@^18.6.2":
+  "integrity" "sha512-llTd3cQAfEPHHtC/lXLV4lltzs7HSXrwXqePF8qMZJ5PnCZRV+dubPw9yUN/08kIDgnR0qmM6p3sQJT2pF4Hxg=="
+  "resolved" "https://registry.npmjs.org/@react-native-firebase/firestore/-/firestore-18.6.2.tgz"
+  "version" "18.6.2"
+
+"@react-native-firebase/storage@^18.6.2":
+  "integrity" "sha512-qgwIq2Q1/eaNyXd6KGBLoHuymKDlZMBmnfXc2B7WTklXVe68obaC6ZsP0c2oAWqUJ/g8zhhM7lK49vsff04lvw=="
+  "resolved" "https://registry.npmjs.org/@react-native-firebase/storage/-/storage-18.6.2.tgz"
+  "version" "18.6.2"
 
 "@react-native/assets-registry@^0.72.0":
   "integrity" "sha512-Im93xRJuHHxb1wniGhBMsxLwcfzdYreSZVQGDoMJgkd6+Iky61LInGEHnQCTN0fKNYF1Dvcofb4uMmE1RQHXHQ=="
@@ -6123,6 +6128,11 @@
   "resolved" "https://registry.npmjs.org/react-is/-/react-is-17.0.2.tgz"
   "version" "17.0.2"
 
+"react-native-image-crop-picker@^0.40.2":
+  "integrity" "sha512-u9iceozX8985vtZV5ozLMfNuCDjtm00GivExSxKwZmwv2wZYyv30VJkKhVJffVYsujvIzMfSCaWJPBsb5nSfZg=="
+  "resolved" "https://registry.npmjs.org/react-native-image-crop-picker/-/react-native-image-crop-picker-0.40.2.tgz"
+  "version" "0.40.2"
+
 "react-native-popover-view@^5.1.8":
   "integrity" "sha512-kDH2liv/Xb8y0JCY25Ft2SiA5fJtVL4o7gk2dXyhXeNhjSEEss3Z3hZyeYMi4ctHimovWSBZz/CjfejNbUF1jA=="
   "resolved" "https://registry.npmjs.org/react-native-popover-view/-/react-native-popover-view-5.1.8.tgz"
@@ -6152,7 +6162,7 @@
     "prop-types" "^15.7.2"
     "yargs" "^16.1.1"
 
-"react-native@*", "react-native@^0.72.4":
+"react-native@*", "react-native@^0.72.4", "react-native@>=0.40.0":
   "integrity" "sha512-dqVFojOO9rOvyFbbM3/v9/GJR355OSuBhEY4NQlMIRc2w0Xch5MT/2uPoq3+OvJ+5h7a8LFAco3fucSffG0FbA=="
   "resolved" "https://registry.npmjs.org/react-native/-/react-native-0.72.7.tgz"
   "version" "0.72.7"
