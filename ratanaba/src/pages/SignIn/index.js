@@ -72,11 +72,14 @@ export default function SignIn() {
       })
       .catch((err) => {
         console.log(err);
+
         if (err.code === 'auth/invalid-email') {
           setErrorMessage('Email inválido!');
-        } else if (err.code === 'auth/email-already-in-use') {
+        } 
+        else if (err.code === 'auth/email-already-in-use') {
           setErrorMessage('Email já em uso!');
-        } else if (err.code === 'auth/weak-password') {
+        } 
+        else if (err.code === 'auth/weak-password') {
           setErrorMessage('Senha fraca!');
         } else {
           setErrorMessage("");
@@ -90,12 +93,17 @@ export default function SignIn() {
       .then(()=>{
         navigation.goBack();
       })
-      .catch((error)=>{
-        console.log(error)
-        if (error.code === 'auth/invalid-login') {
-          setErrorMessage('Email ou senha incorretos!');
-        }else if (error.code === 'auth/invalid-email'){
+      .catch((err)=>{
+        console.log(err)
+
+        if (err.code === 'auth/invalid-login') {
+          setErrorMessage('Email e/ou senha incorretos!');
+        } 
+        else if (err.code === 'auth/invalid-email') {
           setErrorMessage('Email inválido!');
+        } 
+        else if (err.code === 'auth/network-request-failed') {
+          setErrorMessage('Solicitação falhou, erro de rede!')
         } else {
           setErrorMessage("")
         }

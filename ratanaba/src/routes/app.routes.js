@@ -9,7 +9,6 @@ import Chat from '../pages/Chat';
 import Search from '../pages/Search';
 import ChatConfig from '../components/ChatConfig';
 
-
 const AppStack = createNativeStackNavigator();
 
 export default function AppRoutes() {

@@ -66,8 +66,8 @@ export default function ChatMessage({ data, thread }) {
           text: editedText
         });
       setIsEditing(false);
-    } catch (error) {
-      console.error('Erro ao atualizar mensagem:', error);
+    } catch (err) {
+      console.error('Erro ao atualizar mensagem:', err);
     }
   }
 
@@ -76,8 +76,8 @@ export default function ChatMessage({ data, thread }) {
       await firestore().collection('grupos').doc(thread)
         .collection('mensagens').doc(documentId)
         .delete();
-    } catch (error) {
-      console.error('Erro ao atualizar mensagem:', error);
+    } catch (err) {
+      console.error('Erro ao atualizar mensagem:', err);
     }
   }
 
@@ -93,8 +93,7 @@ export default function ChatMessage({ data, thread }) {
           marginLeft: isMyMessage ? 50 : 0,
           marginRight: isMyMessage ? 0 : 50,
           borderBottomWidth: 1,
-          borderBottomColor: data.system === true ? '#000' : 'transparent',
-          width: 'auto'
+          borderBottomColor: data.system === true ? '#000' : 'transparent'
         }
         ]}
         >
@@ -108,6 +107,7 @@ export default function ChatMessage({ data, thread }) {
               onChangeText={handleTextChange}
               onBlur={() => updateMessage(data._id)}
               autoFocus
+              multiline 
             />
           ) : (
             data.message === "image" ? (
@@ -122,7 +122,9 @@ export default function ChatMessage({ data, thread }) {
 
 
           <Text style={styles.hour}>
-            {new Date(data?.createdAt?.nanoseconds * 1000 + data?.createdAt?.seconds).toLocaleTimeString('pt-BR', { timeZone: 'America/Sao_Paulo', hour: '2-digit', minute: '2-digit' })}
+            {new Date(data?.createdAt?.nanoseconds * 1000 + data?.createdAt?.seconds).toLocaleTimeString('pt-BR', {
+              timeZone: 'America/Sao_Paulo', hour: '2-digit', minute: '2-digit',
+            })}
           </Text>
 
         </View>
@@ -137,7 +139,8 @@ const styles = StyleSheet.create({
   },
   messageBox: {
     borderRadius: 5,
-    padding: 10
+    padding: 10,
+    
   },
   name: {
     color: '#F53745',

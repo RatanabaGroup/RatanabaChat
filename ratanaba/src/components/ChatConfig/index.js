@@ -78,8 +78,8 @@ export default function ChatConfig({ route }) {
         .collection('participantes')
         .doc(relation.id)
         .delete();
-    } catch (error) {
-      console.error('Erro ao atualizar mensagem:', error);
+    } catch (err) {
+      console.error('Erro ao atualizar mensagem:', err);
     }
     navigation.navigate('Dashboard')
   }
@@ -92,8 +92,8 @@ export default function ChatConfig({ route }) {
         .collection('participantes')
         .doc(id)
         .delete();
-    } catch (error) {
-      console.error('Erro ao atualizar mensagem:', error);
+    } catch (err) {
+      console.error('Erro ao atualizar mensagem:', err);
     }
     navigation.navigate('Dashboard')
   }

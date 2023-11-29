@@ -1,8 +1,6 @@
 import React, { useState, useEffect } from 'react';
-import {
-  View, StyleSheet, SafeAreaView, FlatList,
-  KeyboardAvoidingView, Platform, TextInput, TouchableOpacity
-} from 'react-native';
+import { View, StyleSheet, SafeAreaView, FlatList, Modal, Text, 
+        KeyboardAvoidingView, Platform, TextInput, TouchableOpacity } from 'react-native';
 import Feather from 'react-native-vector-icons/Feather';
 import ImagePicker from 'react-native-image-crop-picker';
 
@@ -19,6 +17,10 @@ export default function Chat({ route }) {
   const [input, setInput] = useState('');
 
   const user = auth().currentUser.toJSON();
+
+  const [modalVisible, setModalVisible] = useState(false);
+  const [capturedImage, setCapturedImage] = useState(null);
+
 
   useEffect(() => {
     const unsubscribeListener = firestore().collection('grupos')
@@ -78,45 +80,98 @@ export default function Chat({ route }) {
     setInput('');
   }
 
-  function handleUpload() {
+  function handleChooseFromGallery() {
     ImagePicker.openPicker({
       cropping: false
     }).then(async image => {
-      const imgName = image.path.substring(image.path.lastIndexOf('/') + 1);
-        const exit = imgName.split('.').pop();
-        const newName = `${imgName.split('.')[0]}${Date.now()}.${exit}`;
-
-        await storage().ref(`chatMedia/${newName}`).putFile(image.path);
-
-        const imgUrl = await storage().ref(`chatMedia/${newName}`).getDownloadURL()
-
-        await firestore().collection('grupos').doc(thread._id)
-          .collection('mensagens')
-          .add({
-            text: imgUrl, message: 'image',
-            createdAt: firestore.FieldValue.serverTimestamp(),
-            user: { _id: user.uid, displayName: user.displayName }
-          })
-
-        await firestore().collection('grupos').doc(thread._id)
-          .set({
-            lastMessage: { text: '📷 Foto', message: 'image',
-              createdAt: firestore.FieldValue.serverTimestamp(),
-            } }, { merge: true }
-          )
-
-    }).catch(error => {
+      handleImageUpload(image.path);
+    }).catch(err => {
       console.log('OPÇÃO 1: Usuário cancelou a seleção de imagem. OU')
-      console.log('OPÇÃO 2: Erro ao selecionar imagem:', error)
+      console.log('OPÇÃO 2: Erro ao selecionar imagem:', err)
     });
   }
 
+  function handleTakePhoto() {
+    ImagePicker.openCamera({
+      cropping: false
+    }).then(async image => {
+      setCapturedImage(image);
+      setModalVisible(true);
+    }).catch(err => {
+      console.log('Erro ao tirar foto da câmera:', err);
+    });
+  }
 
+  async function handleSendImg() {
+    if (capturedImage) {
+      handleImageUpload(capturedImage.path);
+      setModalVisible(false);
+    }
+  }
+
+  function handleDiscardImg() { setModalVisible(false) }
+
+  async function handleImageUpload(uri) {
+    const imgName = uri.substring(uri.lastIndexOf('/') + 1);
+    const exit = imgName.split('.').pop();
+    const newName = `${imgName.split('.')[0]}${Date.now()}.${exit}`;
+
+    await storage().ref(`images/${newName}`).putFile(uri);
+
+    const imgUrl = await storage().ref(`images/${newName}`).getDownloadURL();
+
+    await firestore().collection('grupos').doc(thread._id)
+      .collection('mensagens')
+      .add({
+        text: imgUrl, message: 'image',
+        createdAt: firestore.FieldValue.serverTimestamp(),
+        user: { _id: user.uid, displayName: user.displayName }
+      })
+
+    await firestore().collection('grupos').doc(thread._id)
+      .set({
+        lastMessage: {
+          text: '📷 Foto', message: 'image',
+          createdAt: firestore.FieldValue.serverTimestamp(),
+        }
+      }, { merge: true }
+      )
+  }
 
   return (
     <SafeAreaView style={styles.container}>
+
+      <Modal
+        animationType="slide"
+        transparent={true}
+        visible={modalVisible}
+        onRequestClose={() => {
+          setModalVisible(!modalVisible);
+        }}
+      >
+        <View style={styles.modalContainer}>
+          <View style={styles.modalContent}>
+            <Text style={styles.modalText}>Deseja enviar a foto tirada?</Text>
+            <View style={styles.modalButtons}>
+              <TouchableOpacity
+                style={styles.modalButton}
+                onPress={handleSendImg}
+              >
+                <Text style={styles.modalButtonText}>Enviar</Text>
+              </TouchableOpacity>
+              <TouchableOpacity
+                style={styles.modalButton}
+                onPress={handleDiscardImg}
+              >
+                <Text style={styles.modalButtonText}>Descartar</Text>
+              </TouchableOpacity>
+            </View>
+          </View>
+        </View>
+      </Modal>
+
       <FlatList
-        style={{ width: 'auto' }}
+        style={{ width: '100%' }}
         data={messages}
         keyExtractor={item => item._id}
         renderItem={({ item }) => <ChatMessage data={item} thread={thread?._id} />}
@@ -130,9 +185,9 @@ export default function Chat({ route }) {
       >
         <View style={styles.containerInput}>
 
-          <TouchableOpacity onPress={handleUpload}>
+          <TouchableOpacity onPress={handleChooseFromGallery}>
             <View style={styles.buttonUpload}>
-              <Feather name="paperclip" size={26} color="#A8A8A8" />
+              <Feather name="paperclip" size={22} color="#A8A8A8" />
             </View>
           </TouchableOpacity>
 
@@ -145,6 +200,12 @@ export default function Chat({ route }) {
               multiline={true}
               autoCorrect={false}
             />
+
+            <TouchableOpacity onPress={handleTakePhoto}>
+              <View style={styles.buttonPhoto}>
+                <Feather name="camera" size={22} color="#A8A8A8" />
+              </View>
+            </TouchableOpacity>
           </View>
 
           <TouchableOpacity onPress={handleSend}>
@@ -172,7 +233,7 @@ const styles = StyleSheet.create({
   },
   buttonUpload: {
     height: 48,
-    width: 48,
+    width: 30,
     alignItems: 'center',
     justifyContent: 'center',
   },
@@ -182,7 +243,10 @@ const styles = StyleSheet.create({
     backgroundColor: '#FFF',
     flex: 1,
     borderRadius: 25,
-    marginRight: 10,
+    marginHorizontal: 10,
+  },
+  buttonPhoto:{
+    marginRight: 14,
   },
   textInput: {
     flex: 1,
@@ -197,5 +261,37 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'center',
     borderRadius: 25,
-  }
+  },
+
+  modalContainer: {
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
+    backgroundColor: 'rgba(0, 0, 0, 0.5)',
+  },
+  modalContent: {
+    backgroundColor: '#fff',
+    padding: 20,
+    borderRadius: 10,
+    alignItems: 'center',
+  },
+  modalText: {
+    marginBottom: 20,
+    fontSize: 16,
+  },
+  modalButtons: {
+    flexDirection: 'row',
+  },
+  modalButton: {
+    flex: 1,
+    backgroundColor: '#51c880',
+    borderRadius: 5,
+    padding: 10,
+    marginHorizontal: 5,
+    alignItems: 'center',
+  },
+  modalButtonText: {
+    color: '#fff',
+    fontWeight: 'bold',
+  },
 })
