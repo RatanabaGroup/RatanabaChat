@@ -1,8 +1,15 @@
 import React, { useEffect, useState } from 'react';
-import { View, Text, StyleSheet, TouchableOpacity, FlatList, Alert } from 'react-native';
+import {
+  View,
+  Text,
+  StyleSheet,
+  TouchableOpacity,
+  FlatList,
+  Alert,
+} from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import Popover from 'react-native-popover-view';
-import Feather from 'react-native-vector-icons/Feather';
+import Feather from 'react-native-vector-icons/Feather'; // Make sure you have this import
 import { useNavigation } from '@react-navigation/native';
 
 import auth from '@react-native-firebase/auth';
@@ -10,9 +17,10 @@ import firestore from '@react-native-firebase/firestore';
 
 export default function ChatConfig({ route }) {
   const [participants, setParticipants] = useState([]);
-  const [relation, setRelation] = useState([]);
-  const { idGrupo } = route.params;
+  const [relation, setRelation] = useState({});
+  const [isVisible, setIsVisible] = useState(false);
 
+  const { idGrupo } = route.params;
   const user = auth().currentUser.toJSON();
   const navigation = useNavigation();
 
@@ -24,19 +32,16 @@ export default function ChatConfig({ route }) {
         .collection('participantes')
         .get();
 
-      // const participantsData = participantsCollection.docs.map(doc => doc.data());
-      const participantsData = participantsCollection.docs.map(doc => ({
+      const participantsData = participantsCollection.docs.map((doc) => ({
         ...doc.data(),
-        id: doc.id
-      }))
+        id: doc.id,
+      }));
 
-      // console.log(participantsData);
-
-      participantsCollection.docs.map(doc => {
+      participantsCollection.docs.forEach((doc) => {
         if (doc.data().email === user.email) {
           const participantData = {
             ...doc.data(),
-            id: doc.id
+            id: doc.id,
           };
           setRelation(participantData);
         }
@@ -46,31 +51,49 @@ export default function ChatConfig({ route }) {
     };
 
     fetchData();
-  }, [idGrupo]);
+  }, [idGrupo, user.email]);
 
-  const [isVisible, setIsVisible] = useState(false);
-  const showPopover = () => { setIsVisible(true) }
-  const closePopover = () => { setIsVisible(false) }
-
-  function exitRoom() {
-    Alert.alert(
-      "Atenção",
-      "Você tem certeza que deseja sair do grupo?",
-      [
-        {
-          text: "Cancelar",
-          onPress: () => { },
-          style: "cancel"
-        },
-        {
-          text: "Confirmar",
-          onPress: () => handleExitRoom()
-        }
-      ]
-    )
+  function showPopover(item) {
+    if (relation.position === "Admin"){
+      if (item.position === "Admin") {
+        return null
+      } else{
+        Alert.alert(
+          `Deseja remover ${item.name}?`,
+          "Escolha uma opção:",
+          [
+            {
+              text: "Remover",
+              onPress: () => {
+                removeParticipant(item.id);
+              }
+            }, {
+              text: "Cancelar",
+              style: "cancel"
+            }
+          ]
+        );
+      }
+    } else {
+      return null
+    }
   }
 
-  async function handleExitRoom() {
+  const exitRoom = () => {
+    Alert.alert('Atenção', 'Você tem certeza que deseja sair do grupo?', [
+      {
+        text: 'Cancelar',
+        onPress: () => {},
+        style: 'cancel',
+      },
+      {
+        text: 'Confirmar',
+        onPress: handleExitRoom,
+      },
+    ]);
+  };
+
+  const handleExitRoom = async () => {
     try {
       await firestore()
         .collection('grupos')
@@ -81,10 +104,10 @@ export default function ChatConfig({ route }) {
     } catch (err) {
       console.error('Erro ao atualizar mensagem:', err);
     }
-    navigation.navigate('Dashboard')
-  }
+    navigation.navigate('Dashboard');
+  };
 
-  async function remove(id) {
+  const removeParticipant = async (id) => {
     try {
       await firestore()
         .collection('grupos')
@@ -95,8 +118,8 @@ export default function ChatConfig({ route }) {
     } catch (err) {
       console.error('Erro ao atualizar mensagem:', err);
     }
-    navigation.navigate('Dashboard')
-  }
+    navigation.navigate('Dashboard');
+  };
 
   return (
     <SafeAreaView>
@@ -109,7 +132,10 @@ export default function ChatConfig({ route }) {
         keyExtractor={(item) => item.id}
         renderItem={({ item }) => (
           <>
-            <TouchableOpacity onPress={showPopover} style={styles.row}>
+            <TouchableOpacity
+              onPress={() => showPopover(item)}
+              style={styles.row}
+            >
               <View style={styles.content}>
                 <Text style={styles.contentName}>{item.name}</Text>
               </View>
@@ -117,43 +143,16 @@ export default function ChatConfig({ route }) {
                 <Text style={styles.contentPosition}>{item.position}</Text>
               </View>
             </TouchableOpacity>
-
-            {relation.position === 'Admin' && (
-              <Popover
-                onClose={closePopover}
-                isVisible={isVisible}
-                popoverStyle={{
-                  height: 150,
-                  width: 300,
-                  justifyContent: "center",
-                  alignItems: "center"
-                }}
-              >
-                <TouchableOpacity onPress={() => remove(item.id)}>
-                  <Text style={[styles.option, { color: 'red' }]}>
-                    Remover do grupo
-                  </Text>
-                </TouchableOpacity>
-                <TouchableOpacity onPress={closePopover}>
-                  <Text style={[styles.option, { color: '#2E54D4' }]}>
-                    Fechar
-                  </Text>
-                </TouchableOpacity>
-              </Popover>
-            )}
-
             <View style={styles.bottomBorder} />
           </>
         )}
       />
 
-
-      {relation.position === 'Membro' ? (
+      {relation.position === 'Membro' && (
         <TouchableOpacity style={styles.leave} onPress={exitRoom}>
           <Feather name="log-out" size={28} color="#000" />
         </TouchableOpacity>
-      ) : null}
-
+      )}
     </SafeAreaView>
   );
 }
@@ -169,7 +168,7 @@ const styles = StyleSheet.create({
     fontSize: 24,
     fontWeight: 'bold',
     color: '#000',
-    justifyContent: 'center'
+    justifyContent: 'center',
   },
   row: {
     paddingHorizontal: 20,
@@ -205,4 +204,10 @@ const styles = StyleSheet.create({
     marginTop: 10,
     alignItems: 'center',
   },
-})
+  popoverStyle: {
+    height: 150,
+    width: 300,
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+});

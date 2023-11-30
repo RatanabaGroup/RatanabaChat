@@ -11,7 +11,6 @@ export default function ChatList({ data, deleteRoom, userStatus }){
     }else{
       navigation.navigate("SignIn")
     }
-
   }
 
   return(
