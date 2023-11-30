@@ -44,16 +44,17 @@
 | SPRINT | CÓDIGO | DESCRIÇÃO                                                           | STATUS |
 | :----: | :----: | :------------------------------------------------------------------ | :----: |
 |   1    |  RF1   | Aplicativo multi-usuários                                           |   ✅   |
-|   2    |  RF2   | Usuário pode apagar ou editar suas próprias mensagens e/ou arquivos |   ✅   |
-|   3    |  RF3   | Chat de grupos, com usuários categorizados                          |        |
-|   4    |  RF4   | Envio da localização do usuário com mapa.                           |        |
+|   2    |  RF2   | Usuário pode apagar ou editar suas próprias mensagens               |   ✅   |
+|   3    |  RF3   | Chat de grupos, com usuários categorizados                          |   ✅   |
+|   3    |  RF4   | Administrador apagar participantes e mensagens do grupo             |   ✅   |
+|   3    |  RF5   | Membros podem sair do grupo                                         |   ✅   |
+|   4    |  RF6   | Envio de imagens e pdfs                                             |        |
 
 #### Requisitos Não Funcionais  
 
 | CÓDIGO | DESCRIÇÃO                                            |
 | :----: | :--------------------------------------------------- |
 |  RNF1  | Limitação na quantidade de grupo criados por usuário |
-|  RNF2  | Foto de perfil                                       |
 
 #### Tecnologias Desejáveis  
 
