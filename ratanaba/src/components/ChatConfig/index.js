@@ -1,15 +1,7 @@
 import React, { useEffect, useState } from 'react';
-import {
-  View,
-  Text,
-  StyleSheet,
-  TouchableOpacity,
-  FlatList,
-  Alert,
-} from 'react-native';
+import { View, Text, StyleSheet, TouchableOpacity, FlatList, Alert } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
-import Popover from 'react-native-popover-view';
-import Feather from 'react-native-vector-icons/Feather'; // Make sure you have this import
+import Feather from 'react-native-vector-icons/Feather';
 import { useNavigation } from '@react-navigation/native';
 
 import auth from '@react-native-firebase/auth';
@@ -27,21 +19,18 @@ export default function ChatConfig({ route }) {
   useEffect(() => {
     const fetchData = async () => {
       const participantsCollection = await firestore()
-        .collection('grupos')
-        .doc(idGrupo)
+        .collection('grupos').doc(idGrupo)
         .collection('participantes')
         .get();
 
       const participantsData = participantsCollection.docs.map((doc) => ({
-        ...doc.data(),
-        id: doc.id,
+        ...doc.data(), id: doc.id, 
       }));
 
       participantsCollection.docs.forEach((doc) => {
         if (doc.data().email === user.email) {
           const participantData = {
-            ...doc.data(),
-            id: doc.id,
+            ...doc.data(), id: doc.id,
           };
           setRelation(participantData);
         }
@@ -53,21 +42,19 @@ export default function ChatConfig({ route }) {
     fetchData();
   }, [idGrupo, user.email]);
 
-  function showPopover(item) {
-    if (relation.position === "Admin"){
+  function showOptions(item) {
+    if (relation.position === "Admin") {
       if (item.position === "Admin") {
         return null
-      } else{
+      } else {
         Alert.alert(
           `Deseja remover ${item.name}?`,
           "Escolha uma opção:",
-          [
-            {
-              text: "Remover",
-              onPress: () => {
-                removeParticipant(item.id);
-              }
-            }, {
+          [{
+            text: "Remover",
+            onPress: () => { 
+              removeParticipant(item.id) }
+            },{
               text: "Cancelar",
               style: "cancel"
             }
@@ -80,13 +67,13 @@ export default function ChatConfig({ route }) {
   }
 
   const exitRoom = () => {
-    Alert.alert('Atenção', 'Você tem certeza que deseja sair do grupo?', [
+    Alert.alert('Atenção', 
+    'Você tem certeza que deseja sair do grupo?', [
       {
         text: 'Cancelar',
         onPress: () => {},
         style: 'cancel',
-      },
-      {
+      },{
         text: 'Confirmar',
         onPress: handleExitRoom,
       },
@@ -96,10 +83,8 @@ export default function ChatConfig({ route }) {
   const handleExitRoom = async () => {
     try {
       await firestore()
-        .collection('grupos')
-        .doc(route.params.idGrupo)
-        .collection('participantes')
-        .doc(relation.id)
+        .collection('grupos').doc(route.params.idGrupo)
+        .collection('participantes').doc(relation.id)
         .delete();
     } catch (err) {
       console.error('Erro ao atualizar mensagem:', err);
@@ -110,10 +95,8 @@ export default function ChatConfig({ route }) {
   const removeParticipant = async (id) => {
     try {
       await firestore()
-        .collection('grupos')
-        .doc(route.params.idGrupo)
-        .collection('participantes')
-        .doc(id)
+        .collection('grupos').doc(route.params.idGrupo)
+        .collection('participantes').doc(id)
         .delete();
     } catch (err) {
       console.error('Erro ao atualizar mensagem:', err);
@@ -133,7 +116,7 @@ export default function ChatConfig({ route }) {
         renderItem={({ item }) => (
           <>
             <TouchableOpacity
-              onPress={() => showPopover(item)}
+              onPress={() => showOptions(item)}
               style={styles.row}
             >
               <View style={styles.content}>
@@ -203,11 +186,5 @@ const styles = StyleSheet.create({
   leave: {
     marginTop: 10,
     alignItems: 'center',
-  },
-  popoverStyle: {
-    height: 150,
-    width: 300,
-    justifyContent: 'center',
-    alignItems: 'center',
-  },
+  }
 });

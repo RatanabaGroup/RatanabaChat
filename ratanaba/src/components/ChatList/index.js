@@ -6,9 +6,9 @@ export default function ChatList({ data, deleteRoom, userStatus }){
   const navigation = useNavigation();
 
   function openChat(){
-    if(userStatus){
+    if (userStatus) {
       navigation.navigate("Chat", { thread: data })
-    }else{
+    } else {
       navigation.navigate("SignIn")
     }
   }

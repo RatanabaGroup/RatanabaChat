@@ -1,8 +1,6 @@
 import React, { useState, useEffect } from 'react';
-import {
-  View, Text, StyleSheet, SafeAreaView, TouchableOpacity,
-  Image, Modal, ActivityIndicator, FlatList, Alert
-} from 'react-native';
+import { View, StyleSheet, SafeAreaView, TouchableOpacity,
+         Image, Modal, FlatList, Alert } from 'react-native';
 
 import auth from '@react-native-firebase/auth';
 import firestore from '@react-native-firebase/firestore';
@@ -48,8 +46,7 @@ export default function Dashboard() {
   
         const threads = await Promise.all(snapshot.docs.map(async documentSnapshot => {
           const participantsCollection = await firestore()
-            .collection('grupos')
-            .doc(documentSnapshot.id)
+            .collection('grupos').doc(documentSnapshot.id)
             .collection('participantes')
             .get();
   
@@ -57,13 +54,11 @@ export default function Dashboard() {
   
           if (participant) {
             return {
-              _id: documentSnapshot.id,
-              name: '',
+              _id: documentSnapshot.id, name: '',
               lastMessage: { text: '' },
               ...documentSnapshot.data()
             };
           }
-  
           return null;
         }));
   
@@ -71,9 +66,8 @@ export default function Dashboard() {
           setThreads(threads.filter(thread => thread !== null));
           setLoading(false);
         }
-      } catch (error) {
-        // Handle errors, e.g., log them or show an error message
-        console.error('Error fetching chats:', error);
+      } catch (err) {
+        console.error('Erro ao carregar chats:', err);
       }
     }
   
@@ -91,28 +85,23 @@ export default function Dashboard() {
     // Se está tentando deletar e nao é o dono
     if (ownerId !== user?.uid) return;
 
-    Alert.alert(
-      "Atenção!",
+    Alert.alert( "Atenção!",
       "Você tem certeza que deseja deletar essa sala?",
-      [
-        {
+      [{
           text: "Cancelar",
-          onPress: () => { },
+          onPress: () => {},
           style: "cancel"
-        },
-        {
+        },{
           text: "Confirmar",
           onPress: () => handleDeleteRoom(idRoom)
         }
       ]
     )
-
   }
 
   async function handleDeleteRoom(idRoom) {
     await firestore()
-      .collection('grupos')
-      .doc(idRoom)
+      .collection('grupos').doc(idRoom)
       .delete();
 
     setUpdateScreen(!updateScreen);

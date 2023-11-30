@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { View, StyleSheet, SafeAreaView, FlatList, Modal, Text, 
+import { View, StyleSheet, SafeAreaView, FlatList, Modal, Text, Alert,
         KeyboardAvoidingView, Platform, TextInput, TouchableOpacity } from 'react-native';
 import Feather from 'react-native-vector-icons/Feather';
 import ImagePicker from 'react-native-image-crop-picker';
@@ -53,8 +53,7 @@ export default function Chat({ route }) {
     if (input === '') return;
 
     await firestore()
-      .collection('grupos')
-      .doc(thread._id)
+      .collection('grupos').doc(thread._id)
       .collection('mensagens')
       .add({
         text: input,
@@ -67,8 +66,7 @@ export default function Chat({ route }) {
       })
 
     await firestore()
-      .collection('grupos')
-      .doc(thread._id)
+      .collection('grupos').doc(thread._id)
       .set({
         lastMessage: {
           text: input,
@@ -80,7 +78,29 @@ export default function Chat({ route }) {
     setInput('');
   }
 
-  function handleChooseFromGallery() {
+  function showFileOptions() {
+    Alert.alert(
+      `Opções`,
+      "Deseja enviar que tipo de arquivo?",
+      [{
+          text: "Cancelar",
+          style: "cancel"
+        },{
+          text: "Foto",
+          onPress: () => { handleImgGallery() }
+        },{
+          text: "Documento",
+          onPress: () => { handleFileGallery() }
+        }
+      ]
+    );
+  }
+
+  function handleFileGallery() {
+    
+  }
+
+  function handleImgGallery() {
     ImagePicker.openPicker({
       cropping: false
     }).then(async image => {
@@ -185,7 +205,7 @@ export default function Chat({ route }) {
       >
         <View style={styles.containerInput}>
 
-          <TouchableOpacity onPress={handleChooseFromGallery}>
+          <TouchableOpacity onPress={showFileOptions}>
             <View style={styles.buttonUpload}>
               <Feather name="paperclip" size={22} color="#A8A8A8" />
             </View>
@@ -262,6 +282,8 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     borderRadius: 25,
   },
+
+  //-----------------------------------------
 
   modalContainer: {
     flex: 1,
