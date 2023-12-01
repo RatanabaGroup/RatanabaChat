@@ -1,8 +1,9 @@
 import React, { useState, useEffect } from 'react';
 import { View, StyleSheet, SafeAreaView, FlatList, Modal, Text, Alert,
-        KeyboardAvoidingView, Platform, TextInput, TouchableOpacity } from 'react-native';
+  KeyboardAvoidingView, Platform, TextInput, TouchableOpacity } from 'react-native';
 import Feather from 'react-native-vector-icons/Feather';
 import ImagePicker from 'react-native-image-crop-picker';
+import DocumentPicker from 'react-native-document-picker';
 
 import auth from '@react-native-firebase/auth';
 import firestore from '@react-native-firebase/firestore';
@@ -21,18 +22,15 @@ export default function Chat({ route }) {
   const [modalVisible, setModalVisible] = useState(false);
   const [capturedImage, setCapturedImage] = useState(null);
 
-
   useEffect(() => {
     const unsubscribeListener = firestore().collection('grupos')
-      .doc(thread._id)
-      .collection('mensagens')
+      .doc(thread._id).collection('mensagens')
       .orderBy('createdAt', 'desc')
       .onSnapshot(querySnapshot => {
         const messages = querySnapshot.docs.map(doc => {
           const firebaseData = doc.data()
           const data = {
-            _id: doc.id,
-            text: '',
+            _id: doc.id, text: '',
             createdAt: firestore.FieldValue.serverTimestamp(),
             ...firebaseData
           }
@@ -78,33 +76,72 @@ export default function Chat({ route }) {
     setInput('');
   }
 
-  function showFileOptions() {
-    Alert.alert(
-      `Opções`,
-      "Deseja enviar que tipo de arquivo?",
-      [{
-          text: "Cancelar",
-          style: "cancel"
-        },{
-          text: "Foto",
-          onPress: () => { handleImgGallery() }
-        },{
-          text: "Documento",
-          onPress: () => { handleFileGallery() }
-        }
-      ]
-    );
-  }
+  // function showFileOptions() {
+  //   Alert.alert(
+  //     `Opções`,
+  //     "Deseja enviar que tipo de arquivo?",
+  //     [{
+  //       text: "Cancelar",
+  //       style: "cancel"
+  //     }, {
+  //       text: "Foto",
+  //       onPress: () => { handleImgGallery() }
+  //     }, {
+  //       text: "Documento",
+  //       onPress: () => { handleFileGallery() }
+  //     }
+  //     ]
+  //   );
+  // }
 
-  function handleFileGallery() {
+  // async function handleFileGallery() {
+  //   try {
+  //     const result = await DocumentPicker.pick({
+  //         type: [DocumentPicker.types.pdf],
+  //     });
+  //     console.log(result[0].uri);
+  //     handlePdfUpload(result[0].uri);
+  //   } catch (err) {
+  //     if (DocumentPicker.isCancel(err)) {
+  //       console.log('Envio do pdf cancelado');
+  //     } else {
+  //       console.log('Erro ao escolher o documento', err);
+  //     }
+  //   }
+  // };
+
+  // async function handlePdfUpload(uri) {
+  //   const pdfName = uri.substring(uri.lastIndexOf('/') + 1);
+  //   const exit = pdfName.split('.').pop();
+  //   const newName = `${pdfName.split('.')[0]}${Date.now()}.${exit}`;
+  
+  //   await storage().ref(`pdfs/${newName}`).putFile(uri);
+  
+  //   const pdfUrl = await storage().ref(`pdfs/${newName}`).getDownloadURL();
     
-  }
+  //   await firestore().collection('grupos').doc(thread._id)
+  //     .collection('mensagens')
+  //     .add({
+  //       text: pdfUrl, message: 'pdf',
+  //       createdAt: firestore.FieldValue.serverTimestamp(),
+  //       user: { _id: user.uid, displayName: user.displayName },
+  //     })
+  
+  //   await firestore().collection('grupos').doc(thread._id)
+  //     .set({ lastMessage: {
+  //           text: '📄 PDF', message: 'pdf',
+  //           createdAt: firestore.FieldValue.serverTimestamp(),
+  //       },
+  //     },{ merge: true }
+  //     );
+  // }
 
   function handleImgGallery() {
     ImagePicker.openPicker({
       cropping: false
     }).then(async image => {
-      handleImageUpload(image.path);
+      setCapturedImage(image);
+      setModalVisible(true);
     }).catch(err => {
       console.log('OPÇÃO 1: Usuário cancelou a seleção de imagem. OU')
       console.log('OPÇÃO 2: Erro ao selecionar imagem:', err)
@@ -174,13 +211,13 @@ export default function Chat({ route }) {
             <Text style={styles.modalText}>Deseja enviar a foto tirada?</Text>
             <View style={styles.modalButtons}>
               <TouchableOpacity
-                style={styles.modalButton}
+                style={styles.modalButton1}
                 onPress={handleSendImg}
               >
                 <Text style={styles.modalButtonText}>Enviar</Text>
               </TouchableOpacity>
               <TouchableOpacity
-                style={styles.modalButton}
+                style={styles.modalButton2}
                 onPress={handleDiscardImg}
               >
                 <Text style={styles.modalButtonText}>Descartar</Text>
@@ -205,7 +242,7 @@ export default function Chat({ route }) {
       >
         <View style={styles.containerInput}>
 
-          <TouchableOpacity onPress={showFileOptions}>
+          <TouchableOpacity onPress={handleImgGallery}>
             <View style={styles.buttonUpload}>
               <Feather name="paperclip" size={22} color="#A8A8A8" />
             </View>
@@ -265,7 +302,7 @@ const styles = StyleSheet.create({
     borderRadius: 25,
     marginHorizontal: 10,
   },
-  buttonPhoto:{
+  buttonPhoto: {
     marginRight: 14,
   },
   textInput: {
@@ -275,7 +312,7 @@ const styles = StyleSheet.create({
     minHeight: 48,
   },
   buttonSend: {
-    backgroundColor: '#51c880',
+    backgroundColor: '#51C880',
     height: 48,
     width: 48,
     alignItems: 'center',
@@ -304,9 +341,17 @@ const styles = StyleSheet.create({
   modalButtons: {
     flexDirection: 'row',
   },
-  modalButton: {
+  modalButton1: {
     flex: 1,
-    backgroundColor: '#51c880',
+    backgroundColor: '#51C880',
+    borderRadius: 5,
+    padding: 10,
+    marginHorizontal: 5,
+    alignItems: 'center',
+  },
+  modalButton2: {
+    flex: 1,
+    backgroundColor: '#EEA262',
     borderRadius: 5,
     padding: 10,
     marginHorizontal: 5,

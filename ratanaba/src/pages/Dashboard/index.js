@@ -1,12 +1,11 @@
 import React, { useState, useEffect } from 'react';
 import { View, StyleSheet, SafeAreaView, TouchableOpacity,
          Image, Modal, FlatList, Alert } from 'react-native';
+import { useNavigation, useIsFocused } from '@react-navigation/native';
+import MaterialIcons from 'react-native-vector-icons/MaterialIcons';
 
 import auth from '@react-native-firebase/auth';
 import firestore from '@react-native-firebase/firestore';
-
-import { useNavigation, useIsFocused } from '@react-navigation/native';
-import MaterialIcons from 'react-native-vector-icons/MaterialIcons';
 
 import AddButton from '../../components/AddButton';
 import ModalGrupo from '../../components/ModalGrupo';
@@ -24,8 +23,6 @@ export default function Dashboard() {
   const [threads, setThreads] = useState([]);
   const [loading, setLoading] = useState(true);
   const [updateScreen, setUpdateScreen] = useState(false);
-  const [participants, setParticipants] = useState([]);
-  const [relation, setRelation] = useState({});
 
   useEffect(() => {
     const hasUser = auth().currentUser ? auth().currentUser.toJSON() : null;
@@ -67,7 +64,7 @@ export default function Dashboard() {
           setLoading(false);
         }
       } catch (err) {
-        console.error('Erro ao carregar chats:', err);
+        console.log('Erro ao carregar chats:', err);
       }
     }
   
@@ -80,10 +77,8 @@ export default function Dashboard() {
   
 
   function deleteRoom(ownerId, idRoom) {
-    // console.log(typeof idRoom)
-
     // Se está tentando deletar e nao é o dono
-    if (ownerId !== user?.uid) return;
+    if (ownerId !== user?.displayName) return;
 
     Alert.alert( "Atenção!",
       "Você tem certeza que deseja deletar essa sala?",
@@ -115,7 +110,7 @@ export default function Dashboard() {
         navigation.navigate("SignIn")
       })
       .catch(() => {
-        console.log("Nao ha usuario logado")
+        console.log("Não há usuário logado")
       })
   }
 

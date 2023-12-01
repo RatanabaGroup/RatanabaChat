@@ -5,8 +5,9 @@
 <h3> Ratanaba </h3>
 
 <p>
-    <a href="#sobre">Sobre</a> | <a href="#backlog">Backlogs</a> | <a href="#manuais">Manual</a> | <a href="#equipe">Equipe</a>
+    <a href="#sobre">Sobre</a> | <a href="#backlog">Backlogs</a> | <a href="#manuais">Manual</a> | <a href="#modelo">Diagrama</a> | <a href="#equipe">Equipe</a>
 </p>
+
 
  <a href="https://pt-br.reactjs.org/" target="blank"><img align="center" src="https://img.shields.io/badge/React-20232A?style=for-the-badge&logo=react&logoColor=61DAFB" alt="react native"/></a> 
  <a href="https://developer.mozilla.org/pt-BR/docs/Web/HTML" target="blank"><img align="center" src="https://img.shields.io/badge/HTML5-E34F26?style=for-the-badge&logo=html5&logoColor=white" alt="html"/></a>
@@ -30,6 +31,8 @@
  O Ratanaba é um aplicativo de mensagens multi-usuários que permite a comunicação entre várias pessoas em grupos e em conversas diretas. 
  Ele oferece uma ampla gama de funcionalidades para garantir uma experiência de comunicação eficaz e segura.
 
+Confira a idealização inicial do projeto:
+
  - Mockup: clique em [link](https://www.figma.com/file/Z8cq5p8fAsvwqpAnGYiIhp/%F0%9F%90%B6-Ratanaba-%F0%9F%A6%B4?type=design&node-id=0%3A1&mode=design&t=abjt9pcSr3BCzQ38-1) e veja através do Figma
  - Protótipo navegável: [navegue](https://www.figma.com/proto/Z8cq5p8fAsvwqpAnGYiIhp/%F0%9F%90%B6-Ratanaba-%F0%9F%A6%B4?type=design&node-id=1-138&t=abjt9pcSr3BCzQ38-0&scaling=min-zoom&page-id=0%3A1&starting-point-node-id=1%3A138) entre as páginas
 
@@ -41,20 +44,21 @@
 
  #### Épicos (Requisitos Funcionais) 
 
-| SPRINT | CÓDIGO | DESCRIÇÃO                                                           | STATUS |
-| :----: | :----: | :------------------------------------------------------------------ | :----: |
-|   1    |  RF1   | Aplicativo multi-usuários                                           |   ✅   |
-|   2    |  RF2   | Usuário pode apagar ou editar suas próprias mensagens               |   ✅   |
-|   3    |  RF3   | Chat de grupos, com usuários categorizados                          |   ✅   |
-|   3    |  RF4   | Administrador apagar participantes e mensagens do grupo             |   ✅   |
-|   3    |  RF5   | Membros podem sair do grupo                                         |   ✅   |
-|   4    |  RF6   | Envio de imagens e pdfs                                             |        |
+| SPRINT | CÓDIGO | DESCRIÇÃO                                                           |
+| :----: | :----: | :------------------------------------------------------------------ |
+|   1    |  RF1   | Aplicativo multi-usuários                                           |
+|   2    |  RF2   | Usuário pode deletar ou editar suas próprias mensagens        |
+|   3    |  RF3   | Chat de grupos, com usuários categorizados                          |
+|   3    |  RF4   | Administrador pode deletar participantes e mensagens do grupo |
+|   3    |  RF5   | O membro pode sair do grupo                                      |
+|   4    |  RF6   | Envio de imagem usando sensor de câmera e por arquivo      |
 
 #### Requisitos Não Funcionais  
 
-| CÓDIGO | DESCRIÇÃO                                            |
-| :----: | :--------------------------------------------------- |
-|  RNF1  | Limitação na quantidade de grupo criados por usuário |
+| CÓDIGO | DESCRIÇÃO                                        |
+| :----: | :----------------------------------------------- |
+|  RNF1  | Limitar quantidade de grupos criados por usuário |
+|  RNF2  | Pesquisar nome de grupo                          |
 
 #### Tecnologias Desejáveis  
 
@@ -69,7 +73,7 @@
 
  ## :cloud: Modelo do banco de bados
 
-![modeloRatanaba](https://github.com/RatanabaGroup/Chat/assets/100284976/1faec5cc-2480-461e-b367-a08959b2ff13)
+
 
  <br>
 
@@ -80,14 +84,13 @@
 * Depois de instalar as tecnologias necessárias para o projeto (NodeJS e Android Studio) digite no cmd:
 
   ```
-  git clone https://github.com/RatanabaGroup/Chat.git
-  cd Chat
-  cd project
+  git clone https://github.com/RatanabaGroup/RatanabaChat.git
+  cd RatanabaChat
+  cd ratanaba
   npm install
-  adb devices
   npx react-native run-android
   ```
-
+  
 * Ou baixe o executável em seu celular.
 
  <br>
