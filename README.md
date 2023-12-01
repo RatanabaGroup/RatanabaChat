@@ -72,8 +72,8 @@ Confira a idealização inicial do projeto:
 <span id="modelo">
 
  ## :cloud: Modelo do banco de bados
-
-
+ 
+![modelo_banco](https://github.com/RatanabaGroup/RatanabaChat/assets/100285168/1f5d425c-aae3-4feb-89fa-2e2e49a20817)
 
  <br>
 
